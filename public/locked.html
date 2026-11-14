@@ -1,0 +1,30 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>lmphone</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+body{margin:0;min-height:100dvh;display:grid;place-items:center;padding:24px;
+ font-family:'Pretendard Variable',Pretendard,-apple-system,system-ui,sans-serif;color:#1b1c33;
+ background:radial-gradient(900px 500px at 10% 0%,#dfe4ff,transparent 60%),
+ radial-gradient(800px 500px at 110% 20%,#ffe1f0,transparent 55%),
+ radial-gradient(800px 500px at 50% 120%,#fff0d9,transparent 60%),#f5f6ff}
+.box{background:#fff;border-radius:22px;padding:28px 24px;max-width:380px;width:100%;
+ box-shadow:0 14px 40px rgba(40,40,90,.12);text-align:center}
+h1{margin:14px 0 6px;font-size:22px;letter-spacing:-.6px;
+ background:linear-gradient(95deg,#6d7cff,#a06bff 45%,#ff6fb1);-webkit-background-clip:text;background-clip:text;color:transparent}
+p{margin:0 0 18px;font-size:13.5px;color:#6b6d8a;line-height:1.6}
+input{width:100%;border:1px solid #e6e7f5;border-radius:14px;padding:12px 14px;font:15px inherit;
+ background:#fbfbff;outline:0;text-align:center;letter-spacing:.5px}
+input:focus{border-color:#6d7cff;box-shadow:0 0 0 3px rgba(109,124,255,.15)}
+button{width:100%;margin-top:12px;padding:13px;border:0;border-radius:14px;color:#fff;font:700 15px inherit;
+ cursor:pointer;background:linear-gradient(135deg,#6d7cff,#a06bff 55%,#ff6fb1);box-shadow:0 6px 16px rgba(109,124,255,.35)}
+</style></head><body>
+<div class="box">
+<svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#a06bff" stroke-width="1.7" stroke-linecap="round"><rect x="4" y="10.5" width="16" height="10.5" rx="2.6"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>
+<h1>키가 필요해</h1>
+<p>맥 터미널에 찍힌 접속 키를 넣거나,<br>QR 링크로 바로 들어와</p>
+<form onsubmit="event.preventDefault();location.href='/?k='+encodeURIComponent(document.getElementById('k').value.trim())">
+<input id="k" placeholder="접속 키" autocapitalize="off" autocorrect="off" spellcheck="false">
+<button type="submit">들어가기</button>
+</form>
+</div></body></html>

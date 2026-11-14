@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#6d7cff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>lmphone</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+:root{
+  --g1:#6d7cff; --g2:#a06bff; --g3:#ff6fb1; --g4:#ffb45c;
+  --bg:#f5f6ff; --card:#ffffff; --ink:#1b1c33; --dim:#6b6d8a;
+  --line:#e6e7f5; --me1:#6d7cff; --me2:#a06bff;
+  --font:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',system-ui,sans-serif;
+  --mono:'SFMono-Regular',ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{
+  font-family:var(--font); color:var(--ink);
+  background:
+    radial-gradient(1200px 600px at 10% -10%, #dfe4ff 0%, transparent 60%),
+    radial-gradient(900px 500px at 110% 10%, #ffe1f0 0%, transparent 55%),
+    radial-gradient(900px 600px at 50% 120%, #fff0d9 0%, transparent 60%),
+    var(--bg);
+  overscroll-behavior-y:none;
+}
+#app{display:flex;flex-direction:column;height:100dvh}
+
+/* 헤더 */
+header{
+  display:flex;align-items:center;gap:8px;
+  padding:calc(env(safe-area-inset-top) + 10px) 12px 10px;
+  background:rgba(255,255,255,.72);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);position:relative;z-index:5;
+}
+.iconbtn{
+  width:38px;height:38px;flex:0 0 38px;border:0;border-radius:12px;
+  background:#fff;box-shadow:0 1px 3px rgba(40,40,90,.12);
+  display:grid;place-items:center;cursor:pointer;color:var(--ink);
+}
+.iconbtn:active{transform:scale(.94)}
+.brand{font-weight:800;font-size:17px;letter-spacing:-.4px;
+  background:linear-gradient(95deg,var(--g1),var(--g2) 45%,var(--g3));
+  -webkit-background-clip:text;background-clip:text;color:transparent;white-space:nowrap}
+.modelpick{
+  flex:1;min-width:0;display:flex;align-items:center;gap:6px;
+  background:#fff;border:1px solid var(--line);border-radius:12px;padding:0 8px;height:38px;
+}
+.modelpick select{
+  appearance:none;border:0;background:transparent;font:600 13px var(--font);color:var(--ink);
+  width:100%;outline:0;text-overflow:ellipsis
+}
+.tgl{display:flex;align-items:center;gap:5px;height:38px;padding:0 10px;flex:0 0 auto;
+  border:1px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;
+  font:700 12.5px var(--font);color:var(--dim);white-space:nowrap;transition:.18s}
+.tgl.on{border-color:transparent;color:#fff;
+  background:linear-gradient(135deg,var(--g1),var(--g2) 60%,var(--g3));
+  box-shadow:0 4px 12px rgba(109,124,255,.3)}
+.tgl:active{transform:scale(.94)}
+.tgl svg{opacity:.85}
+.swrow{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px}
+.swrow .lb{font-size:13px;font-weight:700}
+.swrow .hint{font-size:11.5px;color:var(--dim);font-weight:500;margin-top:4px;line-height:1.5}
+.sw{width:50px;height:30px;flex:0 0 50px;margin-top:2px;border:0;border-radius:999px;
+  background:#dfe1f0;position:relative;cursor:pointer;transition:.2s}
+.sw.on{background:linear-gradient(135deg,var(--g1),var(--g2))}
+.sw::after{content:'';position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;
+  background:#fff;transition:.2s;box-shadow:0 1px 4px rgba(30,30,70,.25)}
+.sw.on::after{transform:translateX(20px)}
+.dot{width:8px;height:8px;border-radius:50%;background:#c9cbe0;flex:0 0 8px;transition:.3s}
+.dot.on{background:linear-gradient(135deg,#3ddc97,#19c37d);box-shadow:0 0 0 3px rgba(25,195,125,.18)}
+
+/* 메시지 */
+main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 12px 4px}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.row{display:flex;width:100%}
+.row.me{justify-content:flex-end}
+.bubble{
+  max-width:86%;padding:11px 14px;border-radius:18px;font-size:15.5px;line-height:1.62;
+  word-break:break-word;overflow-wrap:anywhere;box-shadow:0 2px 10px rgba(40,40,90,.06)
+}
+.me .bubble{
+  background:linear-gradient(135deg,var(--me1),var(--me2));color:#fff;border-bottom-right-radius:6px;
+  box-shadow:0 6px 18px rgba(109,124,255,.32)
+}
+.ai .bubble{background:var(--card);border:1px solid var(--line);border-bottom-left-radius:6px}
+.bubble p{margin:0 0 .6em}.bubble p:last-child{margin-bottom:0}
+.bubble ul,.bubble ol{margin:.3em 0 .6em;padding-left:1.25em}
+.bubble li{margin:.15em 0}
+.bubble h1,.bubble h2,.bubble h3{margin:.5em 0 .35em;font-size:1.05em;font-weight:800;letter-spacing:-.3px}
+.bubble code{font-family:var(--mono);font-size:.88em;background:#f0f1fb;padding:1px 5px;border-radius:6px}
+.me .bubble code{background:rgba(255,255,255,.22)}
+.bubble pre{
+  margin:.5em 0;background:#1d1f36;color:#e8e9ff;border-radius:12px;padding:12px 13px;
+  overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.55
+}
+.bubble pre code{background:transparent;padding:0;font-size:inherit;color:inherit}
+.bubble a{color:var(--g1)}
+.me .bubble a{color:#fff}
+.bubble table{border-collapse:collapse;font-size:13.5px;margin:.4em 0;display:block;overflow-x:auto}
+.bubble th,.bubble td{border:1px solid var(--line);padding:5px 9px;text-align:left}
+details.think{margin:0 0 .6em;border:1px dashed #cfd2ea;border-radius:12px;background:#fafaff;padding:6px 10px}
+details.think summary{cursor:pointer;font-size:12.5px;color:var(--dim);font-weight:700;list-style:none}
+details.think summary::-webkit-details-marker{display:none}
+.note{margin-top:8px;font-size:12.5px;color:#a8632b;background:#fff5e6;border:1px solid #ffe0b8;
+  border-radius:10px;padding:7px 10px;line-height:1.5}
+details.think{min-width:190px}
+details.think .tk{font-size:13px;color:var(--dim);white-space:pre-wrap;margin-top:6px}
+.meta{font-size:11px;color:var(--dim);margin:3px 4px 0;display:flex;gap:8px;align-items:center}
+.row.me .meta{justify-content:flex-end}
+.col{display:flex;flex-direction:column;max-width:100%}
+.copy{border:0;background:transparent;color:var(--dim);font:inherit;font-size:11px;cursor:pointer;padding:0;text-decoration:underline}
+
+.typing{display:inline-flex;gap:4px;align-items:center;height:20px}
+.typing i{width:7px;height:7px;border-radius:50%;background:linear-gradient(135deg,var(--g1),var(--g3));animation:bo 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes bo{0%,60%,100%{transform:translateY(0);opacity:.45}30%{transform:translateY(-5px);opacity:1}}
+
+.empty{text-align:center;padding:48px 18px;color:var(--dim)}
+.empty h2{margin:14px 0 6px;font-size:22px;letter-spacing:-.6px;
+  background:linear-gradient(95deg,var(--g1),var(--g2) 40%,var(--g3) 75%,var(--g4));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.empty p{margin:0;font-size:13.5px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:18px}
+.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 14px;font-size:13px;
+  color:var(--ink);cursor:pointer;box-shadow:0 2px 8px rgba(40,40,90,.06)}
+.chip:active{transform:scale(.96)}
+
+/* 입력창 */
+footer{
+  padding:8px 12px calc(env(safe-area-inset-bottom) + 10px);
+  background:rgba(255,255,255,.8);backdrop-filter:blur(14px);border-top:1px solid var(--line)
+}
+.composer{max-width:760px;margin:0 auto;display:flex;gap:8px;align-items:flex-end}
+textarea{
+  flex:1;resize:none;border:1px solid var(--line);border-radius:18px;padding:11px 14px;
+  font:15.5px/1.5 var(--font);max-height:38vh;min-height:44px;background:#fff;outline:0;color:var(--ink)
+}
+textarea:focus{border-color:var(--g1);box-shadow:0 0 0 3px rgba(109,124,255,.15)}
+.send{
+  width:44px;height:44px;flex:0 0 44px;border:0;border-radius:50%;cursor:pointer;
+  background:linear-gradient(135deg,var(--g1),var(--g2) 55%,var(--g3));color:#fff;
+  display:grid;place-items:center;box-shadow:0 6px 16px rgba(109,124,255,.4);transition:.15s
+}
+.send:disabled{opacity:.4;box-shadow:none}
+.send:active{transform:scale(.92)}
+.send.stop{background:linear-gradient(135deg,#ff6b6b,#ff4f8b)}
+
+/* 드로어 */
+.scrim{position:fixed;inset:0;background:rgba(20,20,45,.38);opacity:0;pointer-events:none;transition:.22s;z-index:8}
+.scrim.on{opacity:1;pointer-events:auto}
+aside{
+  position:fixed;top:0;bottom:0;left:0;width:min(84vw,320px);z-index:9;
+  background:#fff;transform:translateX(-102%);transition:transform .24s cubic-bezier(.3,.8,.4,1);
+  display:flex;flex-direction:column;box-shadow:6px 0 30px rgba(30,30,70,.18)
+}
+aside.on{transform:none}
+.ahead{padding:calc(env(safe-area-inset-top) + 16px) 16px 12px;
+  background:linear-gradient(135deg,var(--g1),var(--g2) 50%,var(--g3));color:#fff}
+.ahead .t{font-weight:800;font-size:18px;letter-spacing:-.4px}
+.ahead .s{font-size:12px;opacity:.9;margin-top:2px}
+.newbtn{margin:12px;padding:11px;border:0;border-radius:14px;cursor:pointer;
+  background:linear-gradient(135deg,#f2f3ff,#ffeef8);color:var(--ink);font:700 14px var(--font);
+  display:flex;align-items:center;justify-content:center;gap:7px}
+.list{flex:1;overflow-y:auto;padding:0 8px 8px}
+.item{padding:10px 12px;border-radius:12px;cursor:pointer;display:flex;align-items:center;gap:8px}
+.item:active{background:#f4f5ff}
+.item.on{background:linear-gradient(135deg,#eef0ff,#fdeef7);font-weight:700}
+.item .tx{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+.item .del{opacity:.45;border:0;background:transparent;cursor:pointer;padding:2px;color:var(--ink)}
+.afoot{border-top:1px solid var(--line);padding:10px 12px calc(env(safe-area-inset-bottom) + 12px);
+  font-size:12px;color:var(--dim)}
+
+/* 설정 시트 */
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:9;background:#fff;border-radius:22px 22px 0 0;
+  transform:translateY(102%);transition:transform .24s cubic-bezier(.3,.8,.4,1);
+  padding:8px 16px calc(env(safe-area-inset-bottom) + 18px);box-shadow:0 -6px 30px rgba(30,30,70,.18);
+  max-height:86dvh;overflow-y:auto}
+.sheet.on{transform:none}
+.grip{width:40px;height:4px;border-radius:2px;background:#dcdef0;margin:6px auto 14px}
+.sheet h3{margin:0 0 14px;font-size:17px;letter-spacing:-.4px}
+.f{margin-bottom:16px}
+.f label{display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-bottom:6px}
+.f label span{color:var(--g1)}
+.f textarea,.f input[type=number]{width:100%;border:1px solid var(--line);border-radius:12px;
+  padding:10px 12px;font:14px/1.5 var(--font);background:#fbfbff;outline:0;color:var(--ink)}
+.f textarea{min-height:76px;resize:vertical}
+input[type=range]{width:100%;accent-color:var(--g1)}
+.okbtn{width:100%;padding:13px;border:0;border-radius:14px;cursor:pointer;color:#fff;font:700 15px var(--font);
+  background:linear-gradient(135deg,var(--g1),var(--g2) 55%,var(--g3));box-shadow:0 6px 16px rgba(109,124,255,.35)}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 88px);transform:translate(-50%,14px);
+  background:#1b1c33;color:#fff;padding:9px 16px;border-radius:999px;font-size:13px;opacity:0;
+  transition:.22s;z-index:20;pointer-events:none;max-width:88vw;text-align:center}
+.toast.on{opacity:.95;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <button class="iconbtn" id="menu" aria-label="대화 목록">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+    <div class="modelpick"><span class="dot" id="dot"></span><select id="model"><option>불러오는 중</option></select></div>
+    <button class="tgl" id="think" aria-pressed="true" aria-label="생각하기 켜고 끄기">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.5.4.8.9.9 1.2h5.4c.1-.3.4-.8.9-1.2A6 6 0 0 0 12 3z"/></svg>
+      <span>생각</span>
+    </button>
+    <button class="iconbtn" id="gear" aria-label="설정">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.33.4.6.73.77.3.16.63.24.96.23H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </header>
+
+  <main id="main"><div class="wrap" id="wrap"></div></main>
+
+  <footer>
+    <div class="composer">
+      <textarea id="ta" rows="1" placeholder="맥에서 돌아가는 모델한테 물어보기" enterkeyhint="send"></textarea>
+      <button class="send" id="send" aria-label="보내기">
+        <svg id="sicon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+      </button>
+    </div>
+  </footer>
+</div>
+
+<div class="scrim" id="scrim"></div>
+
+<aside id="drawer">
+  <div class="ahead"><div class="t">lmphone</div><div class="s" id="host">내 맥의 LM Studio</div></div>
+  <button class="newbtn" id="newchat">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>새 대화
+  </button>
+  <div class="list" id="list"></div>
+  <div class="afoot" id="afoot">대화는 이 폰에만 저장돼</div>
+</aside>
+
+<div class="sheet" id="sheet">
+  <div class="grip"></div>
+  <h3>설정</h3>
+  <div class="swrow">
+    <div>
+      <div class="lb">생각하기</div>
+      <div class="hint">추론 모델이 답하기 전에 길게 생각함. 끄면 바로 답해서 훨씬 빠르고 토큰도 덜 씀.
+        생각 안 하는 모델엔 영향 없음.</div>
+    </div>
+    <button class="sw on" id="swthink" role="switch" aria-checked="true" aria-label="생각하기"></button>
+  </div>
+  <div class="f">
+    <label>시스템 프롬프트</label>
+    <textarea id="sys" placeholder="예: 한국어로 간결하게 답해줘"></textarea>
+  </div>
+  <div class="f">
+    <label>온도 <span id="tval">0.7</span></label>
+    <input type="range" id="temp" min="0" max="2" step="0.1" value="0.7">
+  </div>
+  <div class="f">
+    <label>최대 토큰 <span id="mval">4096</span></label>
+    <input type="range" id="maxt" min="256" max="16384" step="256" value="4096">
+  </div>
+  <div class="f">
+    <label>기억할 대화 수 <span id="kval">12</span></label>
+    <input type="range" id="keep" min="2" max="40" step="2" value="12">
+  </div>
+  <button class="okbtn" id="close">저장하고 닫기</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const LS = {
+  get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+
+let cfg = LS.get('lm.cfg', { sys: '', temp: 0.7, maxt: 4096, keep: 12, model: '', think: true });
+if (typeof cfg.think !== 'boolean') cfg.think = true;
+let chats = LS.get('lm.chats', []);
+let cur = LS.get('lm.cur', null);
+let abort = null;
+
+function toast(t) {
+  const el = $('#toast'); el.textContent = t; el.classList.add('on');
+  clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('on'), 1900);
+}
+
+/* ---------- 마크다운 (가벼운 버전) ---------- */
+function esc(s) { return s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c])); }
+function inline(s) {
+  return esc(s)
+    .replace(/`([^`]+)`/g, (_, c) => '<code>' + c + '</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>')
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+}
+function splitThink(src) {
+  let think = '';
+  const body = src.replace(/<think>([\s\S]*?)(<\/think>|$)/gi, (_, t) => { think += t; return ''; });
+  return { think, body };
+}
+function thinkBox(t, open) {
+  if (!t.trim()) return '';
+  return '<details class="think"' + (open ? ' open' : '') + '><summary>생각한 과정 보기</summary>'
+    + '<div class="tk">' + esc(t.trim()) + '</div></details>';
+}
+// 추론 토큰(reasoning_content)과 <think> 태그를 본문과 분리해서 접어둠
+function renderAI(reasoning, content, note) {
+  const s = splitThink(content || '');
+  const think = (reasoning || '') + s.think;
+  const body = s.body.trim();
+  // 추론만 하다 토큰이 끝난 경우엔 추론을 펼쳐서 보여줌
+  let out = thinkBox(think, !body) + md(s.body);
+  if (note) out += '<div class="note">' + esc(note) + '</div>';
+  return out;
+}
+function md(src) {
+  let out = '';
+  const lines = src.split('\n');
+  let i = 0, buf = [], list = null;
+  const flush = () => { if (buf.length) { out += '<p>' + buf.join('<br>') + '</p>'; buf = []; } };
+  const endList = () => { if (list) { out += '</' + list + '>'; list = null; } };
+  while (i < lines.length) {
+    const l = lines[i];
+    const fence = l.match(/^\s*```(\w*)/);
+    if (fence) {
+      flush(); endList();
+      const code = []; i++;
+      while (i < lines.length && !/^\s*```/.test(lines[i])) code.push(lines[i++]);
+      i++;
+      out += '<pre><code>' + esc(code.join('\n')) + '</code></pre>';
+      continue;
+    }
+    const h = l.match(/^(#{1,4})\s+(.*)/);
+    if (h) { flush(); endList(); out += '<h3>' + inline(h[2]) + '</h3>'; i++; continue; }
+    const ul = l.match(/^\s*[-*+]\s+(.*)/);
+    const ol = l.match(/^\s*\d+[.)]\s+(.*)/);
+    if (ul || ol) {
+      flush();
+      const want = ul ? 'ul' : 'ol';
+      if (list !== want) { endList(); out += '<' + want + '>'; list = want; }
+      out += '<li>' + inline((ul || ol)[1]) + '</li>'; i++; continue;
+    }
+    if (!l.trim()) { flush(); endList(); i++; continue; }
+    endList(); buf.push(inline(l)); i++;
+  }
+  flush(); endList();
+  return out;
+}
+
+/* ---------- 대화 저장 ---------- */
+function chat() { return chats.find((c) => c.id === cur); }
+function save() { LS.set('lm.chats', chats); LS.set('lm.cur', cur); }
+function newChat() {
+  const c = { id: Date.now() + '', title: '새 대화', msgs: [] };
+  chats.unshift(c); cur = c.id; save(); render(); renderList(); $('#ta').focus();
+}
+
+function renderList() {
+  const box = $('#list'); box.innerHTML = '';
+  chats.forEach((c) => {
+    const d = document.createElement('div');
+    d.className = 'item' + (c.id === cur ? ' on' : '');
+    d.innerHTML = '<div class="tx"></div><button class="del" aria-label="삭제">'
+      + '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>';
+    d.querySelector('.tx').textContent = c.title;
+    d.onclick = () => { cur = c.id; save(); render(); renderList(); drawer(false); };
+    d.querySelector('.del').onclick = (e) => {
+      e.stopPropagation();
+      chats = chats.filter((x) => x.id !== c.id);
+      if (cur === c.id) cur = chats[0] ? chats[0].id : null;
+      if (!chats.length) newChat(); else { save(); render(); renderList(); }
+    };
+    box.appendChild(d);
+  });
+}
+
+function bubble(role, html, streaming) {
+  const row = document.createElement('div');
+  row.className = 'row ' + (role === 'user' ? 'me' : 'ai');
+  const col = document.createElement('div'); col.className = 'col';
+  const b = document.createElement('div'); b.className = 'bubble';
+  if (streaming) b.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>';
+  else b.innerHTML = html;
+  col.appendChild(b);
+  if (role !== 'user' && !streaming) col.appendChild(metaBar(b));
+  row.appendChild(col);
+  $('#wrap').appendChild(row);
+  return b;
+}
+function metaBar(b) {
+  const m = document.createElement('div'); m.className = 'meta';
+  const cp = document.createElement('button'); cp.className = 'copy'; cp.textContent = '복사';
+  cp.onclick = () => {
+    const t = b.innerText;
+    (navigator.clipboard?.writeText(t) ?? Promise.reject()).then(() => toast('복사했어')).catch(() => {
+      const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta);
+      ta.select(); document.execCommand('copy'); ta.remove(); toast('복사했어');
+    });
+  };
+  m.appendChild(cp);
+  return m;
+}
+
+function render() {
+  const w = $('#wrap'); w.innerHTML = '';
+  const c = chat();
+  if (!c || !c.msgs.length) {
+    w.innerHTML = '<div class="empty">'
+      + '<svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="url(#gg)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'
+      + '<defs><linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6d7cff"/><stop offset=".5" stop-color="#a06bff"/><stop offset="1" stop-color="#ff6fb1"/></linearGradient></defs>'
+      + '<rect x="2.5" y="4" width="19" height="13" rx="3"/><path d="M8 21h8M12 17v4"/><circle cx="9" cy="10.5" r="1.3" fill="url(#gg)" stroke="none"/><circle cx="15" cy="10.5" r="1.3" fill="url(#gg)" stroke="none"/></svg>'
+      + '<h2>맥이 대신 생각해줌</h2><p>모델은 맥에서 돌고, 화면만 폰에 있음</p>'
+      + '<div class="chips">'
+      + '<button class="chip">지금 뭐 할 수 있어?</button>'
+      + '<button class="chip">파이썬 코드 하나 짜줘</button>'
+      + '<button class="chip">영어로 번역해줘</button>'
+      + '</div></div>';
+    w.querySelectorAll('.chip').forEach((ch) => ch.onclick = () => { $('#ta').value = ch.textContent; send(); });
+    return;
+  }
+  c.msgs.forEach((m) => bubble(m.role, m.role === 'user' ? esc(m.content).replace(/\n/g, '<br>') : renderAI(m.think, m.content, m.note)));
+  scroll(true);
+}
+function scroll(force) {
+  const m = $('#main');
+  if (force || m.scrollHeight - m.scrollTop - m.clientHeight < 140) m.scrollTop = m.scrollHeight;
+}
+
+/* ---------- 모델 목록 ---------- */
+async function loadModels() {
+  try {
+    const r = await fetch('/api/models');
+    const j = await r.json();
+    const ms = (j.data || []).map((m) => m.id).filter((id) => !/embed|whisper|rerank/i.test(id));
+    const sel = $('#model'); sel.innerHTML = '';
+    if (!ms.length) { sel.innerHTML = '<option>불러온 모델 없음</option>'; $('#dot').classList.remove('on'); return; }
+    ms.forEach((id) => { const o = document.createElement('option'); o.value = id; o.textContent = id; sel.appendChild(o); });
+    sel.value = ms.includes(cfg.model) ? cfg.model : ms[0];
+    cfg.model = sel.value; LS.set('lm.cfg', cfg);
+    $('#dot').classList.add('on');
+  } catch {
+    $('#model').innerHTML = '<option>맥에 연결 안 됨</option>';
+    $('#dot').classList.remove('on');
+  }
+}
+
+/* ---------- 전송 ---------- */
+async function send() {
+  if (abort) { abort.abort(); return; }
+  const ta = $('#ta');
+  const text = ta.value.trim();
+  if (!text) return;
+  if (!chat()) newChat();
+  const c = chat();
+  c.msgs.push({ role: 'user', content: text });
+  if (c.msgs.length === 1) c.title = text.slice(0, 30);
+  ta.value = ''; ta.style.height = 'auto';
+  save(); renderList();
+  if ($('#wrap').querySelector('.empty')) $('#wrap').innerHTML = '';
+  bubble('user', esc(text).replace(/\n/g, '<br>'));
+  scroll(true);
+
+  const b = bubble('assistant', '', true);
+  scroll(true);
+  setBtn(true);
+
+  const history = c.msgs.slice(-cfg.keep);
+  const msgs = cfg.sys.trim() ? [{ role: 'system', content: cfg.sys }, ...history] : history;
+
+  abort = new AbortController();
+  let acc = '', think = '', fin = '';
+  try {
+    const r = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        model: $('#model').value,
+        messages: msgs,
+        temperature: cfg.temp,
+        max_tokens: cfg.maxt,
+        stream: true,
+        // 생각 끄기: LM Studio가 추론 모델한테 사고 과정을 건너뛰게 함
+        ...(cfg.think ? {} : { reasoning_effort: 'none' }),
+      }),
+      signal: abort.signal,
+    });
+    if (!r.ok) {
+      const t = await r.text();
+      let msg = t;
+      try { msg = JSON.parse(t).error?.message || JSON.parse(t).error || t; } catch {}
+      throw new Error(typeof msg === 'string' ? msg : JSON.stringify(msg));
+    }
+    const rd = r.body.getReader(), dec = new TextDecoder();
+    let buf = '';
+    for (;;) {
+      const { done, value } = await rd.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      const parts = buf.split('\n');
+      buf = parts.pop();
+      for (const line of parts) {
+        const s = line.trim();
+        if (!s.startsWith('data:')) continue;
+        const d = s.slice(5).trim();
+        if (d === '[DONE]') continue;
+        try {
+          const j = JSON.parse(d);
+          const ch = j.choices?.[0];
+          if (ch?.finish_reason) fin = ch.finish_reason;
+          const rc = ch?.delta?.reasoning_content || ch?.delta?.reasoning || '';
+          const piece = ch?.delta?.content || '';
+          if (rc) think += rc;
+          if (rc || piece) {
+            acc += piece;
+            const dots = acc.trim() ? '' : '<span class="typing"><i></i><i></i><i></i></span>';
+            b.innerHTML = (renderAI(think, acc) || '') + dots;
+            scroll();
+          }
+        } catch {}
+      }
+    }
+    let note = '';
+    if (fin === 'length') {
+      note = acc.trim()
+        ? '최대 토큰에 걸려서 여기서 잘렸어. 설정에서 최대 토큰을 늘려봐.'
+        : '생각만 하다가 최대 토큰을 다 썼어. 위의 생각 버튼을 끄거나 설정에서 최대 토큰을 늘려봐.';
+    }
+    if (!acc.trim() && !think.trim()) acc = '(응답이 비어 있음)';
+    b.innerHTML = renderAI(think, acc, note);
+    b.parentElement.appendChild(metaBar(b));
+    c.msgs.push({ role: 'assistant', content: acc, think, note });
+    save();
+  } catch (e) {
+    if (e.name === 'AbortError') {
+      if (acc || think) { c.msgs.push({ role: 'assistant', content: acc, think }); save(); b.innerHTML = renderAI(think, acc); }
+      else b.parentElement.parentElement.remove();
+      toast('중지함');
+    } else {
+      b.innerHTML = '<strong>오류</strong><br>' + esc(String(e.message || e));
+      toast('실패: 맥 쪽 LM Studio 확인');
+    }
+  } finally {
+    abort = null; setBtn(false); scroll();
+  }
+}
+function setBtn(busy) {
+  const s = $('#send');
+  s.classList.toggle('stop', busy);
+  $('#sicon').innerHTML = busy
+    ? '<rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor" stroke="none"/>'
+    : '<path d="M12 19V5M5 12l7-7 7 7"/>';
+}
+
+/* ---------- UI 배선 ---------- */
+function drawer(on) { $('#drawer').classList.toggle('on', on); $('#scrim').classList.toggle('on', on || $('#sheet').classList.contains('on')); }
+function sheet(on) { $('#sheet').classList.toggle('on', on); $('#scrim').classList.toggle('on', on || $('#drawer').classList.contains('on')); }
+$('#menu').onclick = () => drawer(true);
+$('#gear').onclick = () => sheet(true);
+$('#scrim').onclick = () => { drawer(false); sheet(false); };
+$('#close').onclick = () => sheet(false);
+$('#newchat').onclick = () => { newChat(); drawer(false); };
+$('#send').onclick = send;
+
+const ta = $('#ta');
+ta.addEventListener('input', () => { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, window.innerHeight * 0.38) + 'px'; });
+ta.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey && window.innerWidth > 820) { e.preventDefault(); send(); }
+});
+$('#model').onchange = (e) => { cfg.model = e.target.value; LS.set('lm.cfg', cfg); };
+
+function setThink(v, toastIt) {
+  cfg.think = v; LS.set('lm.cfg', cfg);
+  $('#think').classList.toggle('on', v);
+  $('#think').setAttribute('aria-pressed', String(v));
+  $('#swthink').classList.toggle('on', v);
+  $('#swthink').setAttribute('aria-checked', String(v));
+  if (toastIt) toast(v ? '생각하기 켬 — 답이 느려지는 대신 꼼꼼해짐' : '생각하기 끔 — 바로 답함');
+}
+$('#think').onclick = () => setThink(!cfg.think, true);
+$('#swthink').onclick = () => setThink(!cfg.think, false);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { drawer(false); sheet(false); } });
+
+function bindRange(id, key, out, fmt) {
+  const el = $(id);
+  el.value = cfg[key];
+  $(out).textContent = fmt ? fmt(cfg[key]) : cfg[key];
+  el.oninput = () => {
+    cfg[key] = key === 'temp' ? parseFloat(el.value) : parseInt(el.value, 10);
+    $(out).textContent = fmt ? fmt(cfg[key]) : cfg[key];
+    LS.set('lm.cfg', cfg);
+  };
+}
+$('#sys').value = cfg.sys;
+$('#sys').oninput = () => { cfg.sys = $('#sys').value; LS.set('lm.cfg', cfg); };
+bindRange('#temp', 'temp', '#tval', (v) => v.toFixed(1));
+bindRange('#maxt', 'maxt', '#mval');
+bindRange('#keep', 'keep', '#kval', (v) => v / 2 + '턴');
+
+if (!chats.length) newChat();
+if (!chat()) cur = chats[0].id;
+$('#host').textContent = location.host;
+setThink(cfg.think, false);
+render(); renderList(); loadModels();
+setInterval(loadModels, 30000);
+</script>
+</body>
+</html>

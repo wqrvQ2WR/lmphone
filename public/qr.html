@@ -1,0 +1,45 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>lmphone 접속 QR</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<script src="/vendor/qrcode.js"></script>
+<style>
+body{margin:0;min-height:100dvh;display:grid;place-items:center;padding:28px;
+ font-family:'Pretendard Variable',Pretendard,-apple-system,system-ui,sans-serif;color:#1b1c33;
+ background:radial-gradient(900px 500px at 10% 0%,#dfe4ff,transparent 60%),
+ radial-gradient(800px 500px at 110% 20%,#ffe1f0,transparent 55%),
+ radial-gradient(800px 500px at 50% 120%,#fff0d9,transparent 60%),#f5f6ff}
+.card{background:#fff;border-radius:24px;padding:26px;max-width:420px;width:100%;text-align:center;
+ box-shadow:0 14px 40px rgba(40,40,90,.12)}
+h1{margin:0 0 4px;font-size:21px;letter-spacing:-.6px;
+ background:linear-gradient(95deg,#6d7cff,#a06bff 45%,#ff6fb1);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{font-size:13px;color:#6b6d8a;margin-bottom:18px}
+.qr{width:264px;height:264px;margin:0 auto;background:#fff;border-radius:14px}
+.qr svg{width:100%;height:100%;display:block}
+.tag{display:inline-block;margin:16px 0 6px;font-size:11.5px;font-weight:700;color:#6d7cff;
+ background:#eef0ff;border-radius:999px;padding:4px 11px}
+.url{font-size:11.5px;color:#6b6d8a;word-break:break-all;line-height:1.5}
+.hr{height:1px;background:#eceef8;margin:18px 0}
+</style></head><body>
+<div class="card">
+<h1>폰으로 스캔</h1>
+<div class="sub">카메라로 찍으면 바로 열림</div>
+<div id="q" class="qr"></div>
+<div id="tag" class="tag">외부망 (어디서나)</div>
+<div class="url" id="u">불러오는 중…</div>
+<div class="hr"></div>
+<div class="tag" style="color:#a06bff;background:#f6eeff">같은 와이파이</div>
+<div class="url" id="l"></div>
+</div>
+<script>
+fetch('/api/link').then(r=>r.json()).then(d=>{
+  const url = d.url;
+  document.getElementById('u').textContent = url;
+  document.getElementById('l').textContent = d.lan;
+  if(!d.tunnel) document.getElementById('tag').textContent='로컬 주소 (터널 아직 안 뜸)';
+  const qr = qrcode(0, 'M');
+  qr.addData(url);
+  qr.make();
+  document.getElementById('q').innerHTML = qr.createSvgTag({cellSize: 8, margin: 1, scalable: true});
+});
+</script></body></html>
